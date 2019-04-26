@@ -1,27 +1,47 @@
 package org.ozzy.cfenvprocessors.mongodb;
 
+import javax.net.ssl.SSLContext;
+
 import com.mongodb.MongoClientOptions;
 
 import org.ozzy.beancustomizer.config.BeanCustomizer;
-import org.ozzy.cfenvprocessors.ssl.Base64TrustingSocketFactory;
+import org.ozzy.beancustomizer.config.ExtensibleTypedBeanProcessor;
+import org.ozzy.sslcontext.config.SslcontextConfig;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoClientOptionsFactoryBean;
 /**
  * Expects cfenv.processor.icdmongo.enabled=true
- *         cfenv.processor.icdmongo.cert=Base64EncodedSSLTrustedCert
+ *         cfenv.processor.icdmongo.sslcontext=name-of-sslcontext-bean
  */
 @Configuration
 @ConditionalOnProperty(name="cfenv.processor.icdmongo.enabled", havingValue="true")
+@AutoConfigureAfter({ExtensibleTypedBeanProcessor.class,SslcontextConfig.class})
 public class MongoClientOptionsCustomizer implements BeanCustomizer {
 
-    @Value("${cfenv.processor.icdmongo.cert}")
-    String cert;
+    @Autowired
+    SslcontextConfig scc;
+
+    @Autowired
+    ApplicationContext ctx;
+
+    private final String ctxName;
+
+    public MongoClientOptionsCustomizer(@Value("${cfenv.processor.icdmongo.sslcontext}") final String ctxName){
+        this.ctxName = ctxName;
+    }
+
+    private SSLContext getContext(){
+        return ctx.getBean(ctxName,SSLContext.class);
+    }
 
     @Override
     public Class getType() {
@@ -32,7 +52,7 @@ public class MongoClientOptionsCustomizer implements BeanCustomizer {
     public Object postProcessBeforeInit(Object original) {
         try{
             MongoClientOptions o = (MongoClientOptions)original;
-            return MongoClientOptions.builder(o).sslEnabled(true).socketFactory(new Base64TrustingSocketFactory(cert)).build();
+            return MongoClientOptions.builder(o).sslEnabled(true).socketFactory(getContext().getSocketFactory()).build();
         }catch(Exception e){
             throw new FatalBeanException("Unable to add SSL to MongoOptions bean",e);
         }
@@ -46,7 +66,7 @@ public class MongoClientOptionsCustomizer implements BeanCustomizer {
     //Create default bean to customize if the user code didn't have one.
     @Bean
     @ConditionalOnMissingBean
-    public MongoClientOptions mongoClientOptions() {
+    public MongoClientOptions defaultMongoClientOptions() {
         try {
             final MongoClientOptionsFactoryBean bean = new MongoClientOptionsFactoryBean();
             bean.afterPropertiesSet();
