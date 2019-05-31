@@ -1,6 +1,6 @@
-# icd-mongodb-cfenv-processor
+# cfenv-rabbitmq-test
 
-A CfEnvProcessor for ICD MongoDB.
+A CfEnvProcessor for RabbitMQ
 
 It builds on top of : 
 
@@ -14,16 +14,14 @@ The latter is used as quick common approach to tailoring idenitfied config beans
 
 This cfenv processor will take the info from vcap services
 and will write out sslcontext information for the ssl-context-spring-boot-starter
-and will also create properties for a mongo config customizer bean,
-and of course, for spring-data-mongo. 
+and will also create properties for a rabbitmq config customizer bean
 
-Net result is spring-data configured to talk to mongo, with a 
-customized config that will add an ssl context based on the vcap_services info.
+
 
 Sets properties : 
 
-- spring.data.mongodb.uri - to set the mongodb url/host/port/credentials etc.
+- spring.data.rabbitmq.uri - to set the rabbitmq url/host/port/credentials etc.
 - sslcontext.enabled - to enable the ssl context starter
-- sslcontext.contexts.mongodb.trustedcert - to the base64 encoded trusted cert.
-- cfenv.processor.icdmongo.enabled - to enable the mongo config post-processor that enables SSL for mongo.
-- cfenv.processor.icdmongo.sslcontext - to identify which ssl context should be used for mongo ('mongodb')
+- sslcontext.contexts.rabbitmq.trustedcert - to the base64 encoded trusted cert.
+- cfenv.processor.rabbitmq.enabled - to enable the rabbitmq config post-processor that enables SSL for rabbitmq.
+- cfenv.processor.rabbitmq.sslcontext - to identify which ssl context should be used for rabbitmq ('rabbitmq')
