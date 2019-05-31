@@ -1,2 +1,2 @@
 io.pivotal.cfenv.spring.boot.CfEnvProcessor=\
-  org.ozzy.cfenvprocessors.mongodb.MongoDBCfEnvProcessor
+  org.terrence.cfenvprocessors.rabbitmq.RabbitmqCfEnvProcessor

@@ -1,4 +1,4 @@
-package org.ozzy.cfenvprocessors.mongodb;
+package org.terrence.cfenvprocessors.rabbitmq;
 
 import javax.net.ssl.SSLContext;
 
@@ -18,14 +18,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoClientOptionsFactoryBean;
+
+import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
+
 /**
  * Expects cfenv.processor.icdmongo.enabled=true
- *         cfenv.processor.icdmongo.sslcontext=name-of-sslcontext-bean
+ * cfenv.processor.icdmongo.sslcontext=name-of-sslcontext-bean
  */
 @Configuration
-@ConditionalOnProperty(name="cfenv.processor.icdmongo.enabled", havingValue="true")
-@AutoConfigureAfter({ExtensibleTypedBeanProcessor.class,SslcontextConfig.class})
-public class MongoClientOptionsCustomizer implements BeanCustomizer {
+@ConditionalOnProperty(name = "cfenv.processor.icdmongo.enabled", havingValue = "true")
+@AutoConfigureAfter({ ExtensibleTypedBeanProcessor.class, SslcontextConfig.class })
+public class RabbitmqConnectionFactoryCustomizer implements BeanCustomizer {
 
     @Autowired
     SslcontextConfig scc;
@@ -39,8 +42,8 @@ public class MongoClientOptionsCustomizer implements BeanCustomizer {
         this.ctxName = ctxName;
     }
 
-    private SSLContext getContext(){
-        return ctx.getBean(ctxName,SSLContext.class);
+    private SSLContext getContext() {
+        return ctx.getBean(ctxName, SSLContext.class);
     }
 
     @Override
@@ -50,11 +53,12 @@ public class MongoClientOptionsCustomizer implements BeanCustomizer {
 
     @Override
     public Object postProcessBeforeInit(Object original) {
-        try{
-            MongoClientOptions o = (MongoClientOptions)original;
-            return MongoClientOptions.builder(o).sslEnabled(true).socketFactory(getContext().getSocketFactory()).build();
-        }catch(Exception e){
-            throw new FatalBeanException("Unable to add SSL to MongoOptions bean",e);
+        try {
+            MongoClientOptions o = (MongoClientOptions) original;
+            return MongoClientOptions.builder(o).sslEnabled(true).socketFactory(getContext().getSocketFactory())
+                    .build();
+        } catch (Exception e) {
+            throw new FatalBeanException("Unable to add SSL to MongoOptions bean", e);
         }
     }
 
@@ -63,7 +67,7 @@ public class MongoClientOptionsCustomizer implements BeanCustomizer {
         return original;
     }
 
-    //Create default bean to customize if the user code didn't have one.
+    // Create default bean to customize if the user code didn't have one.
     @Bean
     @ConditionalOnMissingBean
     public MongoClientOptions defaultMongoClientOptions() {
