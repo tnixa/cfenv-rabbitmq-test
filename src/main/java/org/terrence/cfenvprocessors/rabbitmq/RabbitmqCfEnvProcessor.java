@@ -19,7 +19,7 @@ public class RabbitmqCfEnvProcessor implements CfEnvProcessor {
     @Override
     public boolean accept(CfService service) {
         boolean match = service.existsByLabelStartsWith("messages-for-rabbitmq");
-        LOG.info("RabbitmqCfEnvProcessor matched service entry : " + service.getName());
+        System.out.println("Match [" + match + "] to service " + service.toString());
         return match;
     }
 

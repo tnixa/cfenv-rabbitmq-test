@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.terrence</groupId>
-    <artifactId>icd-mongodb-cfenv-processor</artifactId>
+    <artifactId>cfenv-rabbitmq-test</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>icd-mongodb-cfenv-processor</name>
-    <description>A CfEnvProcessor Implementation for ICD MongoDB</description>
+    <name>cfenv-rabbitmq-test</name>
+    <description>A CfEnvProcessor Implementation for RabbitMQ</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -28,10 +28,7 @@
             <artifactId>ssl-context-spring-boot-starter</artifactId>
             <version>-SNAPSHOT</version>
         </dependency>        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.github.BarDweller</groupId>
             <artifactId>bean-customizer-spring-boot</artifactId>
@@ -60,5 +57,14 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
+
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
