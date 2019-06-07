@@ -2,11 +2,10 @@ package org.terrence.cfenvprocessors.rabbitmq;
 
 import javax.net.ssl.SSLContext;
 
-import com.rabbitmq.client.ConnectionFactory;
-
 import org.ozzy.beancustomizer.config.BeanCustomizer;
 import org.ozzy.beancustomizer.config.ExtensibleTypedBeanProcessor;
 import org.ozzy.sslcontext.config.SslcontextConfig;
+import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 
 /**
  * Expects cfenv.processor.rabbitmq.enabled=true
@@ -37,6 +35,7 @@ public class RabbitmqConnectionFactoryCustomizer implements BeanCustomizer {
     private final String ctxName;
 
     public RabbitmqConnectionFactoryCustomizer(@Value("${cfenv.processor.rabbitmq.sslcontext}") final String ctxName) {
+        System.out.println("RCFBC constructor");
         this.ctxName = ctxName;
     }
 
@@ -68,9 +67,12 @@ public class RabbitmqConnectionFactoryCustomizer implements BeanCustomizer {
     @Bean
     @ConditionalOnMissingBean
     public RabbitConnectionFactoryBean defaultConnectionFactory() {
+        System.out.println("defaultConnectionFactory before try");
         try {
             final RabbitConnectionFactoryBean bean = new RabbitConnectionFactoryBean();
+            System.out.println("defaultConnectionFactory after new RCFB");
             bean.afterPropertiesSet();
+            System.out.println("defaultConnectionFactory after bean.propertiesSet");
             return bean;
         } catch (final Exception e) {
             throw new BeanCreationException(e.getMessage(), e);

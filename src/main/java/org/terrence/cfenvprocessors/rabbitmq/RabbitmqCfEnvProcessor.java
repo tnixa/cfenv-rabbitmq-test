@@ -51,6 +51,7 @@ public class RabbitmqCfEnvProcessor implements CfEnvProcessor {
         }
 
         if (uri != null && trustedcert != null) {
+            System.out.println("uri is: " + uri);
             properties.put("spring.data.rabbitmq.uri", uri);
 
             properties.put("sslcontext.enabled", true);
